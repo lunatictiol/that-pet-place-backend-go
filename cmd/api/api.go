@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/lunatictiol/that-pet-place-backend-go/services/pets"
 	"github.com/lunatictiol/that-pet-place-backend-go/services/users"
 )
 
@@ -26,8 +27,14 @@ func (a *ApiServer) New(address string,
 func (a *ApiServer) Run() error {
 	router := mux.NewRouter()
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
+
 	userStore := users.NewStore(a.userdb)
+	petStore := pets.NewStore(a.petStoreDB)
+
+	pethandler := pets.NewHandler(petStore)
 	userHandler := users.NewHandler(userStore)
+
+	pethandler.RegisterRoutes(subRouter)
 	userHandler.RegisterRoutes(subRouter)
 	log.Println("listening on port", a.address)
 	return http.ListenAndServe(a.address, router)

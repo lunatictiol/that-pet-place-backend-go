@@ -41,5 +41,5 @@ type UserStore interface {
 
 type PetStore interface {
 	FindPetById(id int) (*Pet, error)
-	CreatePet(Pet) error
+	CreatePet(Pet) (int64, error)
 }
