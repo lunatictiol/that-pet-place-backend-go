@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 
@@ -9,11 +8,9 @@ import (
 )
 
 type Config struct {
-	PublicHost             string
-	Port                   string
 	DBUser                 string
 	DBPassword             string
-	DBAddress              string
+	DBHost                 string
 	DBName                 string
 	JWTSecret              string
 	JWTExpirationInSeconds int64
@@ -25,12 +22,10 @@ func initConfig() Config {
 	godotenv.Load()
 
 	return Config{
-		PublicHost:             getEnv("PUBLIC_HOST", "http://localhost"),
-		Port:                   getEnv("PORT", "3306"),
-		DBUser:                 getEnv("DB_USER", "root"),
-		DBPassword:             getEnv("DB_PASSWORD", "sabiq1234"),
-		DBAddress:              fmt.Sprintf("%s:%s", getEnv("DB_HOST", "127.0.0.1"), getEnv("DB_PORT", "3306")),
-		DBName:                 getEnv("DB_NAME", "ecom"),
+		DBHost:                 getEnv("DATABASE_HOST", "http://localhost"),
+		DBUser:                 getEnv("DATABASE_USER", "root"),
+		DBPassword:             getEnv("DATABASE_PASSWORD", "sabiq1234"),
+		DBName:                 getEnv("DATABASE_NAME", "users"),
 		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
 	}
