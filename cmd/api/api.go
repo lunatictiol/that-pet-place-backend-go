@@ -10,21 +10,23 @@ import (
 )
 
 type ApiServer struct {
-	address string
-	db      *sql.DB
+	address    string
+	userdb     *sql.DB
+	petStoreDB *sql.DB
 }
 
 func (a *ApiServer) New(address string,
-	db *sql.DB) {
+	db, petDb *sql.DB) {
 	a.address = address
-	a.db = db
+	a.userdb = db
+	a.petStoreDB = petDb
 
 }
 
 func (a *ApiServer) Run() error {
 	router := mux.NewRouter()
 	subRouter := router.PathPrefix("/api/v1").Subrouter()
-	userStore := users.NewStore(a.db)
+	userStore := users.NewStore(a.userdb)
 	userHandler := users.NewHandler(userStore)
 	userHandler.RegisterRoutes(subRouter)
 	log.Println("listening on port", a.address)

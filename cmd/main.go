@@ -14,12 +14,21 @@ func main() {
 	var apiServer api.ApiServer
 	connStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
 
-	db, err := db.NewMySqlStorage(connStr)
+	userdb, err := db.NewMySqlStorage(connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	initStorage(db)
-	apiServer.New(":8000", db)
+	initStorage(userdb)
+	petStoreStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
+
+	petdb, err := db.NewMySqlStorage(petStoreStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	println("pet db")
+	initStorage(petdb)
+
+	apiServer.New(":8000", userdb, petdb)
 	err = apiServer.Run()
 	if err != nil {
 		log.Fatal(err)

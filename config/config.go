@@ -12,6 +12,7 @@ type Config struct {
 	DBPassword             string
 	DBHost                 string
 	DBName                 string
+	PETDB                  string
 	JWTSecret              string
 	JWTExpirationInSeconds int64
 }
@@ -28,6 +29,7 @@ func initConfig() Config {
 		DBName:                 getEnv("DATABASE_NAME", "users"),
 		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
+		PETDB:                  getEnv("PETSTORE_DATABASE", "p"),
 	}
 }
 
