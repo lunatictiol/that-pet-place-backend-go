@@ -91,6 +91,13 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
 		return
 	}
-	utils.WriteJson(w, http.StatusCreated, "user created")
+	uId, err := h.store.GetUserId(payload.Email)
+
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJson(w, http.StatusCreated, map[string]string{"message": "Registeration successful", "id": string(uId)})
 
 }

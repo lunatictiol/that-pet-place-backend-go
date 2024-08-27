@@ -33,6 +33,25 @@ func (s *Store) FindUserByEmail(email string) (*types.User, error) {
 		return nil, fmt.Errorf("user not found")
 	}
 	return us, nil
+}
+func (s *Store) GetUserId(email string) (int, error) {
+
+	rows, err := s.db.Query("SELECT * FROM users WHERE email = $1", email)
+	if err != nil {
+		return 0, err
+	}
+	us := new(types.User)
+	for rows.Next() {
+		us, err = scanUsersFromRows(rows)
+		if err != nil {
+			return 0, err
+		}
+
+	}
+	if us.ID == 0 {
+		return 0, fmt.Errorf("user not found")
+	}
+	return us.ID, nil
 
 }
 

@@ -21,8 +21,25 @@ type User struct {
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 }
+type Pet struct {
+	ID         int       `json:"id"`
+	Name       string    `json:"name"`
+	Gender     string    `json:"gender"`
+	User_ID    string    `json:"user_id"`
+	Dob        string    `json:"dob"`
+	Neutered   bool      `json:"neutered"`
+	Vaccinated bool      `json:"vaccinated"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
 type UserStore interface {
 	FindUserByEmail(email string) (*User, error)
 	FindUserById(id int) (*User, error)
+	GetUserId(email string) (int, error)
 	CreateUser(User) error
+}
+
+type PetStore interface {
+	FindPetById(id int) (*Pet, error)
+	CreateUser(Pet) error
 }
