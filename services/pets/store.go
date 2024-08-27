@@ -15,14 +15,40 @@ func NewStore(db *sql.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) CreateUser(pet types.Pet) error {
-	_, err := s.db.Exec("INSERT INTO pets (name, gender, user_id, dob, neutered, vaccinated) VALUES ($1, $2, $3, $4, $5, $6)", pet.Name, pet.Gender, pet.User_ID, pet.Dob, pet.Neutered, pet.Vaccinated)
+func (s *Store) CreatePet(pet types.Pet) (int64, error) {
+	p, err := s.db.Exec("INSERT INTO pets (name, gender, user_id, dob, neutered, vaccinated) VALUES ($1, $2, $3, $4, $5, $6)", pet.Name, pet.Gender, pet.User_ID, pet.Dob, pet.Neutered, pet.Vaccinated)
 	if err != nil {
-		fmt.Print("here", err)
-		return err
+
+		return 0, err
+	}
+	pId, err := p.LastInsertId()
+	if err != nil {
+
+		return 0, err
 	}
 
-	return nil
+	return pId, nil
+}
+
+func (s *Store) FindPetById(id int) (*types.Pet, error) {
+	rows, err := s.db.Query("SELECT * FROM pets WHERE id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+
+	p := new(types.Pet)
+	for rows.Next() {
+		p, err = scanUsersFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if p.ID == 0 {
+		return nil, fmt.Errorf("pet not found")
+	}
+
+	return p, nil
 }
 
 func scanUsersFromRows(row *sql.Rows) (*types.Pet, error) {
