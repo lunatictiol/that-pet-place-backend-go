@@ -44,7 +44,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !auth.ValidatePassword(u.Password, user.Password) {
+	if !auth.ValidatePassword(user.Password, u.Password) {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid password"))
 		return
 	}
@@ -91,6 +91,6 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
 		return
 	}
-	utils.WriteJson(w, http.StatusCreated, nil)
+	utils.WriteJson(w, http.StatusCreated, "user created")
 
 }

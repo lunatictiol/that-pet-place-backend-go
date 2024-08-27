@@ -1,11 +1,11 @@
 build:
-	@go build -o bin/ecom cmd/main.go
+	@go build -o bin/petplace cmd/main.go
 
 test:
 	@go test -v ./...
 	
 run: build
-	@./bin/ecom
+	@./bin/petplace
 
 migration:
 	@migrate create -ext sql -dir cmd/migrate/migrations $(filter-out $@,$(MAKECMDGOALS))
