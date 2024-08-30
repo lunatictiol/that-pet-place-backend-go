@@ -12,6 +12,25 @@ type LoginUserPayload struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required" `
 }
+type PetPayload struct {
+	Name       string `json:"name" validate:"required"`
+	Gender     string `json:"gender" validate:"required"`
+	User_ID    string `json:"user_id" validate:"required"`
+	Dob        string `json:"dob" validate:"required"`
+	Neutered   bool   `json:"neutered" validate:"required"`
+	Vaccinated bool   `json:"vaccinated" validate:"required"`
+	Breed      string `json:"breed"`
+	Species    string `json:"species"`
+	Profile    string `json:"profile"`
+}
+type ProfileUploadPayload struct {
+	Profile string `json:"profile" validate:"required"`
+	ID      int    `json:"id" validate:"required"`
+}
+type PetProfileUploadPayload struct {
+	Profile string `json:"profile" validate:"required"`
+	ID      int    `json:"id" validate:"required"`
+}
 
 type User struct {
 	ID        int       `json:"id"`
@@ -19,6 +38,8 @@ type User struct {
 	LastName  string    `json:"lastName"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
+	PetID     any       `json:"petid"`
+	Profile   any       `json:"profile"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 type Pet struct {
@@ -28,15 +49,18 @@ type Pet struct {
 	User_ID    string    `json:"user_id"`
 	Dob        string    `json:"dob"`
 	Neutered   bool      `json:"neutered"`
+	Breed      string    `json:"breed"`
+	Species    string    `json:"species"`
 	Vaccinated bool      `json:"vaccinated"`
+	Profile    string    `json:"profile"`
 	CreatedAt  time.Time `json:"created_at"`
 }
 
 type UserStore interface {
 	FindUserByEmail(email string) (*User, error)
 	FindUserById(id int) (*User, error)
-	GetUserId(email string) (int, error)
-	CreateUser(User) error
+	CreateUser(User) (int, error)
+	UploadProfile(id int, profileUrl string) error
 }
 
 type PetStore interface {

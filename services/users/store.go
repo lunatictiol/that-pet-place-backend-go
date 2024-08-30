@@ -19,12 +19,14 @@ func (s *Store) FindUserByEmail(email string) (*types.User, error) {
 
 	rows, err := s.db.Query("SELECT * FROM users WHERE email = $1", email)
 	if err != nil {
+		println("sdovnsdovn")
 		return nil, err
 	}
 	us := new(types.User)
 	for rows.Next() {
 		us, err = scanUsersFromRows(rows)
 		if err != nil {
+			println("jbwoiubweiuniu")
 			return nil, err
 		}
 
@@ -33,26 +35,6 @@ func (s *Store) FindUserByEmail(email string) (*types.User, error) {
 		return nil, fmt.Errorf("user not found")
 	}
 	return us, nil
-}
-func (s *Store) GetUserId(email string) (int, error) {
-
-	rows, err := s.db.Query("SELECT * FROM users WHERE email = $1", email)
-	if err != nil {
-		return 0, err
-	}
-	us := new(types.User)
-	for rows.Next() {
-		us, err = scanUsersFromRows(rows)
-		if err != nil {
-			return 0, err
-		}
-
-	}
-	if us.ID == 0 {
-		return 0, fmt.Errorf("user not found")
-	}
-	return us.ID, nil
-
 }
 
 func (s *Store) FindUserById(id int) (*types.User, error) {
@@ -76,14 +58,28 @@ func (s *Store) FindUserById(id int) (*types.User, error) {
 	return u, nil
 }
 
-func (s *Store) CreateUser(user types.User) error {
+func (s *Store) CreateUser(user types.User) (int, error) {
 	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password) VALUES ($1, $2, $3, $4)", user.FirstName, user.LastName, user.Email, user.Password)
 	if err != nil {
-		fmt.Print("here", err)
+
+		return 0, err
+	}
+	u, err := s.FindUserByEmail(user.Email)
+	if err != nil {
+		println("hereeeee")
+		return 0, err
+	}
+	println(u.ID)
+	return u.ID, nil
+}
+func (s *Store) UploadProfile(id int, profileUrl string) error {
+
+	_, err := s.db.Exec("UPDATE users SET profile = $1 WHERE id = $2 ", profileUrl, id)
+	if err != nil {
 		return err
 	}
-
 	return nil
+
 }
 
 func scanUsersFromRows(row *sql.Rows) (*types.User, error) {
@@ -95,6 +91,8 @@ func scanUsersFromRows(row *sql.Rows) (*types.User, error) {
 		&user.Email,
 		&user.Password,
 		&user.CreatedAt,
+		&user.PetID,
+		&user.Profile,
 	)
 
 	if err != nil {

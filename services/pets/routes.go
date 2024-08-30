@@ -22,7 +22,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
-	print("hit")
+
 }
 func (h *Handler) handleGetPet(w http.ResponseWriter, r *http.Request) {
 	print("hit")
