@@ -15,6 +15,8 @@ type Config struct {
 	PETDB                  string
 	JWTSecret              string
 	JWTExpirationInSeconds int64
+	MongoURL               string
+	Port                   string
 }
 
 var Envs = initConfig()
@@ -30,6 +32,8 @@ func initConfig() Config {
 		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),
 		PETDB:                  getEnv("PETSTORE_DATABASE", "p"),
+		MongoURL:               getEnv("MOGODB_URL", "password"),
+		Port:                   getEnv("PORT", "8080"),
 	}
 }
 

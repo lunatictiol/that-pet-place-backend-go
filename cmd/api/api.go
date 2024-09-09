@@ -8,16 +8,17 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/lunatictiol/that-pet-place-backend-go/services/pets"
 	"github.com/lunatictiol/that-pet-place-backend-go/services/users"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ApiServer struct {
 	address    string
 	userdb     *sql.DB
-	petStoreDB *sql.DB
+	petStoreDB *mongo.Client
 }
 
 func (a *ApiServer) New(address string,
-	db, petDb *sql.DB) {
+	db *sql.DB, petDb *mongo.Client) {
 	a.address = address
 	a.userdb = db
 	a.petStoreDB = petDb

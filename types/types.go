@@ -1,12 +1,18 @@
 package types
 
-import "time"
+import (
+	"context"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type RegisterUserPayload struct {
-	FirstName string `json:"firstName" validate:"required"`
-	LastName  string `json:"lastName" validate:"required"`
-	Email     string `json:"email" validate:"required,email"`
-	Password  string `json:"password" validate:"required,min=5,max=8" `
+	FirstName   string `json:"first_name" validate:"required"`
+	LastName    string `json:"last_name" validate:"required"`
+	PhoneNumber string `json:"phone_number" validate:"required"`
+	Email       string `json:"email" validate:"required,email"`
+	Password    string `json:"password" validate:"required,min=5,max=8" `
 }
 type LoginUserPayload struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -33,14 +39,15 @@ type PetProfileUploadPayload struct {
 }
 
 type User struct {
-	ID        int       `json:"id"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	PetID     any       `json:"petid"`
-	Profile   any       `json:"profile"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID          int       `json:"id"`
+	FirstName   string    `json:"first_name"`
+	LastName    string    `json:"last_name"`
+	Email       string    `json:"email"`
+	Password    string    `json:"password"`
+	PetID       any       `json:"petid"`
+	PhoneNumber string    `json:"phone_number"`
+	Profile     any       `json:"profile"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 type Pet struct {
 	ID         int       `json:"id"`
@@ -64,6 +71,12 @@ type UserStore interface {
 }
 
 type PetStore interface {
-	FindPetById(id int) (*Pet, error)
-	CreatePet(Pet) (int64, error)
+	// FindPetById(id int) (*Pet, error)
+	// CreatePet(Pet) (int64, error)
+}
+
+type Manager struct {
+	Connection *mongo.Client
+	Ctx        context.Context
+	Cancel     context.CancelFunc
 }

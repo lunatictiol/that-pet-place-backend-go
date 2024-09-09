@@ -19,14 +19,12 @@ func (s *Store) FindUserByEmail(email string) (*types.User, error) {
 
 	rows, err := s.db.Query("SELECT * FROM users WHERE email = $1", email)
 	if err != nil {
-		println("sdovnsdovn")
 		return nil, err
 	}
 	us := new(types.User)
 	for rows.Next() {
 		us, err = scanUsersFromRows(rows)
 		if err != nil {
-			println("jbwoiubweiuniu")
 			return nil, err
 		}
 
@@ -59,14 +57,13 @@ func (s *Store) FindUserById(id int) (*types.User, error) {
 }
 
 func (s *Store) CreateUser(user types.User) (int, error) {
-	_, err := s.db.Exec("INSERT INTO users (firstName, lastName, email, password) VALUES ($1, $2, $3, $4)", user.FirstName, user.LastName, user.Email, user.Password)
+	_, err := s.db.Exec("INSERT INTO users (first_name, last_name, email, password,phone_number) VALUES ($1, $2, $3, $4,$5)", user.FirstName, user.LastName, user.Email, user.Password, user.PhoneNumber)
 	if err != nil {
 
 		return 0, err
 	}
 	u, err := s.FindUserByEmail(user.Email)
 	if err != nil {
-		println("hereeeee")
 		return 0, err
 	}
 	println(u.ID)
@@ -93,6 +90,7 @@ func scanUsersFromRows(row *sql.Rows) (*types.User, error) {
 		&user.CreatedAt,
 		&user.PetID,
 		&user.Profile,
+		&user.PhoneNumber,
 	)
 
 	if err != nil {
