@@ -23,9 +23,11 @@ type Handler struct {
 }
 
 const (
-	projectID   = "thatpetplace"
-	bucketName  = "pet-parents-profile"
-	credentials = "./application_default_credentials.json"
+	projectID  = "thatpetplace"
+	bucketName = "pet-parents-profile"
+	//local
+	//credentials = "./application_default_credentials.json"
+	credentials = "./etc/secrets/application_default_credentials.json"
 )
 
 func NewHandler(store types.UserStore) *Handler {
@@ -69,7 +71,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJson(w, http.StatusCreated, map[string]string{"message": "Login successful", "token": token, "userId": string(u.ID)})
+	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "Login successful", "token": token, "userId": u.ID})
 
 }
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
