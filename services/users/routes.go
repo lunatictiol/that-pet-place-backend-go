@@ -118,6 +118,7 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 	f, handler, err := r.FormFile("photo")
 	if err != nil {
 		http.Error(w, "No file uploaded", http.StatusBadRequest)
+		println(err)
 		return
 	}
 	defer f.Close()
@@ -130,6 +131,7 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentials))
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		println(err)
 		return
 	}
 	// Create a unique object name for the uploaded file
@@ -139,16 +141,19 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 	sw := client.Bucket(bucketName).Object(objectName).NewWriter(ctx)
 	if _, err := io.Copy(sw, f); err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		println(err)
 		return
 	}
 	if err := sw.Close(); err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		println(err)
 		return
 	}
 
 	u, err := url.Parse("/" + bucketName + "/" + sw.Attrs().Name)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		println(err)
 		return
 	}
 
@@ -156,6 +161,7 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 	userId, err := strconv.Atoi(uId)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("inalid id %s", string(uId)))
+		println(err)
 		return
 
 	}
@@ -164,11 +170,13 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("user doesn't exists with id %s", uId))
+		println(err)
 		return
 	}
 	err = h.store.UploadProfile(userId, u.Path)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		println(err)
 		return
 	}
 	utils.WriteJson(w, http.StatusCreated, map[string]string{"message": "upload successful", "url": u.Path})
