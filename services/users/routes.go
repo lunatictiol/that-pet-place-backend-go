@@ -27,7 +27,7 @@ const (
 	bucketName = "pet-parents-profile"
 	//local
 	//credentials = "./application_default_credentials.json"
-	credentials = "./etc/secrets/application_default_credentials.json"
+	credentials = "/etc/secrets/application_default_credentials.json"
 )
 
 func NewHandler(store types.UserStore) *Handler {
