@@ -50,7 +50,7 @@ func (s *Store) FindPetByUserIdandName(name string, id uuid.UUID) (*types.Pet, e
 	}
 
 	if p.ID == uuid.Nil {
-		return nil, fmt.Errorf("user not found")
+		return nil, fmt.Errorf("pet not found")
 	}
 
 	return p, nil
