@@ -54,9 +54,7 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 		Vaccinated: payload.Vaccinated,
 	})
 	if err != nil {
-		fmt.Printf("here")
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
-		fmt.Printf(err.Error())
 		return
 	}
 	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "pet added successful", "id": uId})

@@ -17,7 +17,7 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) CreatePet(pet types.Pet) (uuid.UUID, error) {
-	p, err := s.FindPetByUserIdandName(pet.Name, pet.User_ID)
+	_, err := s.FindPetByUserIdandName(pet.Name, pet.User_ID)
 	if err == nil {
 		return uuid.Nil, fmt.Errorf("pet already exists with that name")
 	}
@@ -26,7 +26,7 @@ func (s *Store) CreatePet(pet types.Pet) (uuid.UUID, error) {
 		println("1")
 		return uuid.Nil, err
 	}
-	p, err = s.FindPetByUserIdandName(pet.Name, pet.User_ID)
+	p, err := s.FindPetByUserIdandName(pet.Name, pet.User_ID)
 	if err != nil {
 		return uuid.Nil, err
 	}
