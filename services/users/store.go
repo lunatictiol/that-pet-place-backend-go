@@ -87,10 +87,10 @@ func scanUsersFromRows(row *sql.Rows) (*types.User, error) {
 		&user.Email,
 		&user.Password,
 		&user.CreatedAt,
-		&user.PetID,
 		&user.Profile,
 		&user.PhoneNumber,
 		&user.ID,
+		&user.PetID,
 	)
 
 	if err != nil {
