@@ -29,13 +29,13 @@ func (s *Store) FindUserByEmail(email string) (*types.User, error) {
 		}
 
 	}
-	if us.ID == 0 {
+	if us.ID == "" {
 		return nil, fmt.Errorf("user not found")
 	}
 	return us, nil
 }
 
-func (s *Store) FindUserById(id int) (*types.User, error) {
+func (s *Store) FindUserById(id string) (*types.User, error) {
 	rows, err := s.db.Query("SELECT * FROM users WHERE id = $1", id)
 	if err != nil {
 		return nil, err
@@ -49,27 +49,27 @@ func (s *Store) FindUserById(id int) (*types.User, error) {
 		}
 	}
 
-	if u.ID == 0 {
+	if u.ID == "" {
 		return nil, fmt.Errorf("user not found")
 	}
 
 	return u, nil
 }
 
-func (s *Store) CreateUser(user types.User) (int, error) {
+func (s *Store) CreateUser(user types.User) (string, error) {
 	_, err := s.db.Exec("INSERT INTO users (first_name, last_name, email, password,phone_number) VALUES ($1, $2, $3, $4,$5)", user.FirstName, user.LastName, user.Email, user.Password, user.PhoneNumber)
 	if err != nil {
 
-		return 0, err
+		return "", err
 	}
 	u, err := s.FindUserByEmail(user.Email)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	println(u.ID)
 	return u.ID, nil
 }
-func (s *Store) UploadProfile(id int, profileUrl string) error {
+func (s *Store) UploadProfile(id string, profileUrl string) error {
 
 	_, err := s.db.Exec("UPDATE users SET profile = $1 WHERE id = $2 ", profileUrl, id)
 	if err != nil {
@@ -82,7 +82,6 @@ func (s *Store) UploadProfile(id int, profileUrl string) error {
 func scanUsersFromRows(row *sql.Rows) (*types.User, error) {
 	user := new(types.User)
 	err := row.Scan(
-		&user.ID,
 		&user.FirstName,
 		&user.LastName,
 		&user.Email,
@@ -91,6 +90,7 @@ func scanUsersFromRows(row *sql.Rows) (*types.User, error) {
 		&user.PetID,
 		&user.Profile,
 		&user.PhoneNumber,
+		&user.ID,
 	)
 
 	if err != nil {

@@ -19,8 +19,9 @@ func main() {
 		log.Fatal(err)
 	}
 	initStorage(userdb)
+	petStoreStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
 
-	petdb, err := db.NewMongoDbConnection(config.Envs.MongoURL)
+	petdb, err := db.NewMySqlStorage(petStoreStr)
 	if err != nil {
 		log.Fatal(err)
 	}

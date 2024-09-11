@@ -10,7 +10,7 @@ import (
 
 var secretKey = config.Envs.JWTSecret
 
-func GenerateToken(userId int64) (string, error) {
+func GenerateToken(userId string) (string, error) {
 	exp := time.Second * time.Duration(config.Envs.JWTExpirationInSeconds)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

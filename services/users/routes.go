@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -26,8 +25,8 @@ const (
 	projectID  = "thatpetplace"
 	bucketName = "pet-parents-profile"
 	//local
-	//credentials = "./application_default_credentials.json"
-	credentials = "/etc/secrets/application_default_credentials.json"
+	credentials = "./application_default_credentials.json"
+	//credentials = "/etc/secrets/application_default_credentials.json"
 )
 
 func NewHandler(store types.UserStore) *Handler {
@@ -65,7 +64,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := auth.GenerateToken(int64(u.ID))
+	token, err := auth.GenerateToken(u.ID)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
 		return
@@ -158,22 +157,21 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	uId := r.URL.Query().Get("userID")
-	userId, err := strconv.Atoi(uId)
 	if err != nil {
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("inalid id %s", string(uId)))
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("inalid id %s", uId))
 		println(err)
 		return
 
 	}
 
-	_, err = h.store.FindUserById(int(userId))
+	_, err = h.store.FindUserById(uId)
 
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("user doesn't exists with id %s", uId))
 		println(err)
 		return
 	}
-	err = h.store.UploadProfile(userId, u.Path)
+	err = h.store.UploadProfile(uId, u.Path)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
 		println(err)
