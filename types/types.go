@@ -20,12 +20,12 @@ type LoginUserPayload struct {
 	Password string `json:"password" validate:"required" `
 }
 type PetPayload struct {
-	Name       string `json:"name" validate:"required"`
-	Gender     string `json:"gender" validate:"required"`
-	User_ID    string `json:"user_id" validate:"required"`
-	Dob        string `json:"dob" validate:"required"`
-	Neutered   bool   `json:"neutered" validate:"required"`
-	Vaccinated bool   `json:"vaccinated" validate:"required"`
+	Name       string `json:"name"`
+	Gender     string `json:"gender"`
+	User_ID    string `json:"user_id"`
+	Dob        string `json:"dob"`
+	Neutered   bool   `json:"neutered"`
+	Vaccinated bool   `json:"vaccinated"`
 	Breed      string `json:"breed"`
 	Species    string `json:"species"`
 	Age        int    `json:"age"`
