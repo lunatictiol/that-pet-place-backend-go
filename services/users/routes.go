@@ -112,6 +112,14 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 }
 func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
+	uId := r.URL.Query().Get("userID")
+	_, err := h.store.FindUserById(uId)
+
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("user doesn't exists with id %s", uId))
+		println(err)
+		return
+	}
 
 	// Parse the uploaded file
 	f, handler, err := r.FormFile("photo")
@@ -156,14 +164,6 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uId := r.URL.Query().Get("userID")
-	_, err = h.store.FindUserById(uId)
-
-	if err != nil {
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("user doesn't exists with id %s", uId))
-		println(err)
-		return
-	}
 	err = h.store.UploadProfile(uId, u.Path)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)

@@ -23,8 +23,39 @@ func NewHandler(store types.PetStore) *Handler {
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/addPet", h.handleAddPet).Methods("POST")
 	router.HandleFunc("/getPetDetails", h.handleGetPet).Methods("Get")
+	router.HandleFunc("/getAllPets", h.handleGetAllPets).Methods("Get")
+
 }
 
+func (h *Handler) handleGetAllPets(w http.ResponseWriter, r *http.Request) {
+	userId := r.URL.Query().Get("userID")
+	// _, err := h.store.FindUserById(userId)
+	// if err != nil {
+	// 	utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("user doesn't exists with id %s", userId))
+	// 	println(err)
+	// 	return
+	// }
+	uid, err := uuid.Parse(userId)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error parsing id: %s", userId))
+
+		return
+	}
+
+	p, err := h.store.GetAllPets(uid)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error retrieveing data of id: %s", userId))
+
+		return
+	}
+	if p == nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("no pets found for id: %s", userId))
+		return
+
+	}
+	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "pets retrieved successfully", "pets": p})
+
+}
 func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 	var payload types.PetPayload
 	if err := utils.ParseJson(r, &payload); err != nil {
@@ -41,7 +72,7 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid user id %v", err))
 		return
 	}
-	println(uid.String())
+
 	uId, err := h.store.CreatePet(types.Pet{
 		Name:       payload.Name,
 		Gender:     payload.Gender,

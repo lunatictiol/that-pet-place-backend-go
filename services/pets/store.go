@@ -23,7 +23,7 @@ func (s *Store) CreatePet(pet types.Pet) (uuid.UUID, error) {
 	}
 	_, err = s.db.Exec("INSERT INTO pets (name, gender, user_id, dob,neutered,vaccinated,species,breed,age) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9)", pet.Name, pet.Gender, pet.User_ID, pet.Dob, pet.Neutered, pet.Vaccinated, pet.Species, pet.Breed, pet.Age)
 	if err != nil {
-		println("1")
+
 		return uuid.Nil, err
 	}
 	p, err := s.FindPetByUserIdandName(pet.Name, pet.User_ID)
@@ -37,7 +37,7 @@ func (s *Store) CreatePet(pet types.Pet) (uuid.UUID, error) {
 func (s *Store) FindPetByUserIdandName(name string, id uuid.UUID) (*types.Pet, error) {
 	rows, err := s.db.Query("SELECT * FROM pets WHERE name= $1 AND user_id = $2", name, id.String())
 	if err != nil {
-		println("3")
+
 		return nil, err
 	}
 
@@ -55,6 +55,45 @@ func (s *Store) FindPetByUserIdandName(name string, id uuid.UUID) (*types.Pet, e
 
 	return p, nil
 
+}
+func (s *Store) GetAllPets(userId uuid.UUID) ([]map[string]interface{}, error) {
+	rows, err := s.db.Query("SELECT * FROM pets WHERE user_id = $1", userId.String())
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	values := make([]interface{}, len(columns))
+
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	var results []map[string]interface{}
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			return nil, err
+		}
+
+		result := make(map[string]interface{})
+		for i := range columns {
+			result[columns[i]] = values[i]
+		}
+		results = append(results, result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func scanPetsFromRows(row *sql.Rows) (*types.Pet, error) {
