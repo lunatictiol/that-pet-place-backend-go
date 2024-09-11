@@ -75,6 +75,8 @@ type PetStore interface {
 	FindPetByUserIdandName(name string, id uuid.UUID) (*Pet, error)
 	CreatePet(Pet) (uuid.UUID, error)
 	GetAllPets(userId uuid.UUID) ([]map[string]interface{}, error)
+	FindPetById(id string) (*Pet, error)
+	UploadPetProfile(id string, profileUrl string) error
 }
 
 type Manager struct {

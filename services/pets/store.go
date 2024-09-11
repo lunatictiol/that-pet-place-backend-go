@@ -34,8 +34,39 @@ func (s *Store) CreatePet(pet types.Pet) (uuid.UUID, error) {
 	return p.ID, nil
 }
 
+func (s *Store) UploadPetProfile(id string, profileUrl string) error {
+
+	_, err := s.db.Exec("UPDATE pets SET profile = $1 WHERE id = $2 ", profileUrl, id)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
 func (s *Store) FindPetByUserIdandName(name string, id uuid.UUID) (*types.Pet, error) {
 	rows, err := s.db.Query("SELECT * FROM pets WHERE name= $1 AND user_id = $2", name, id.String())
+	if err != nil {
+
+		return nil, err
+	}
+
+	p := new(types.Pet)
+	for rows.Next() {
+		p, err = scanPetsFromRows(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if p.ID == uuid.Nil {
+		return nil, fmt.Errorf("pet not found")
+	}
+
+	return p, nil
+
+}
+func (s *Store) FindPetById(id string) (*types.Pet, error) {
+	rows, err := s.db.Query("SELECT * FROM pets WHERE id= $1", id)
 	if err != nil {
 
 		return nil, err
