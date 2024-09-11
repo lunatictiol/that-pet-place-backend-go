@@ -29,12 +29,6 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 
 func (h *Handler) handleGetAllPets(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("userID")
-	// _, err := h.store.FindUserById(userId)
-	// if err != nil {
-	// 	utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("user doesn't exists with id %s", userId))
-	// 	println(err)
-	// 	return
-	// }
 	uid, err := uuid.Parse(userId)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error parsing id: %s", userId))

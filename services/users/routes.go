@@ -70,7 +70,7 @@ func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "Login successful", "token": token, "userId": u.ID})
+	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "Login successful", "token": token, "userId": u.ID, "first_name": u.FirstName})
 
 }
 func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
