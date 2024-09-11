@@ -25,8 +25,8 @@ const (
 	projectID  = "thatpetplace"
 	bucketName = "pet-parents-profile"
 	//local
-	credentials = "./application_default_credentials.json"
-	//credentials = "/etc/secrets/application_default_credentials.json"
+	//credentials = "./application_default_credentials.json"
+	credentials = "/etc/secrets/application_default_credentials.json"
 )
 
 func NewHandler(store types.UserStore) *Handler {
@@ -157,13 +157,6 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	uId := r.URL.Query().Get("userID")
-	if err != nil {
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("inalid id %s", uId))
-		println(err)
-		return
-
-	}
-
 	_, err = h.store.FindUserById(uId)
 
 	if err != nil {

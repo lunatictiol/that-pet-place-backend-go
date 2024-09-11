@@ -27,6 +27,7 @@ type PetPayload struct {
 	Vaccinated bool   `json:"vaccinated" validate:"required"`
 	Breed      string `json:"breed"`
 	Species    string `json:"species"`
+	Age        int    `json:"age"`
 }
 type ProfileUploadPayload struct {
 	Profile string `json:"profile" validate:"required"`
@@ -49,7 +50,7 @@ type User struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 type Pet struct {
-	ID         int64     `json:"id"`
+	ID         string    `json:"id"`
 	Name       string    `json:"name"`
 	Gender     string    `json:"gender"`
 	User_ID    string    `json:"user_id"`
@@ -58,6 +59,7 @@ type Pet struct {
 	Breed      string    `json:"breed"`
 	Species    string    `json:"species"`
 	Vaccinated bool      `json:"vaccinated"`
+	Age        int       `json:"age"`
 	Profile    string    `json:"profile"`
 	CreatedAt  time.Time `json:"created_at"`
 }
@@ -70,8 +72,8 @@ type UserStore interface {
 }
 
 type PetStore interface {
-	FindPetById(id int64) (*Pet, error)
-	CreatePet(Pet) (int64, error)
+	FindPetById(id string) (*Pet, error)
+	CreatePet(Pet) (string, error)
 }
 
 type Manager struct {
