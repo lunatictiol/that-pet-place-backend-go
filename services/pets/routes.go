@@ -54,16 +54,19 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 	var payload types.PetPayload
 	if err := utils.ParseJson(r, &payload); err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println(err)
 		return
 	}
 	if err := utils.Validator.Struct(payload); err != nil {
 		error := err.(validator.ValidationErrors)
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println(err)
 		return
 	}
 	uid, err := uuid.Parse(payload.User_ID)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid user id %v", err))
+		fmt.Println(err)
 		return
 	}
 
@@ -80,6 +83,7 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		fmt.Println(err)
 		return
 	}
 	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "pet added successful", "id": uId})
