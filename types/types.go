@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -50,18 +51,17 @@ type User struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 type Pet struct {
-	ID         string    `json:"id"`
+	ID         uuid.UUID `json:"id"`
 	Name       string    `json:"name"`
 	Gender     string    `json:"gender"`
-	User_ID    string    `json:"user_id"`
+	User_ID    uuid.UUID `json:"user_id"`
 	Dob        string    `json:"dob"`
 	Neutered   bool      `json:"neutered"`
 	Breed      string    `json:"breed"`
 	Species    string    `json:"species"`
 	Vaccinated bool      `json:"vaccinated"`
 	Age        int       `json:"age"`
-	Profile    string    `json:"profile"`
-	CreatedAt  time.Time `json:"created_at"`
+	Profile    any       `json:"profile"`
 }
 
 type UserStore interface {
@@ -72,8 +72,8 @@ type UserStore interface {
 }
 
 type PetStore interface {
-	FindPetById(id string) (*Pet, error)
-	CreatePet(Pet) (string, error)
+	FindPetByUserIdandName(name string, id uuid.UUID) (*Pet, error)
+	CreatePet(Pet) (uuid.UUID, error)
 }
 
 type Manager struct {
