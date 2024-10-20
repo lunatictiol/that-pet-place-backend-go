@@ -153,6 +153,9 @@ func (s *Store) GetAllAppointments(id string) ([]types.Appointment, error) {
 	collection := s.db.Database("PetServicesData").Collection("appointments")
 	result, err := collection.Find(context.Background(), bson.D{{Key: "user_id", Value: id}})
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // No appointment found with the given id
+		}
 		return nil, err
 	}
 	var ap []types.Appointment
