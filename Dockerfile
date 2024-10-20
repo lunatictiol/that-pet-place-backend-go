@@ -12,8 +12,8 @@ RUN go mod download
 RUN go build -o bin/petplace cmd/main.go
  
 
-# Expose port 8000
-EXPOSE 8000
+# Expose port 8080
+EXPOSE 8080
 
 # Run the Go application
 CMD ["./bin/petplace"]

@@ -69,6 +69,14 @@ func (s *Store) CreateUser(user types.User) (string, error) {
 	println(u.ID)
 	return u.ID, nil
 }
+func (s *Store) UpdateUser(user types.UpdateUserPayload) (string, error) {
+	_, err := s.db.Exec("UPDATE users SET first_name = $1, last_name = $2, phone_number= $3 WHERE id = $4 ", user.FirstName, user.LastName, user.PhoneNumber, user.Id)
+	if err != nil {
+
+		return "", err
+	}
+	return user.Id, nil
+}
 func (s *Store) UploadProfile(id string, profileUrl string) error {
 
 	_, err := s.db.Exec("UPDATE users SET profile = $1 WHERE id = $2 ", profileUrl, id)

@@ -35,9 +35,10 @@ func NewHandler(store types.UserStore) *Handler {
 	}
 }
 func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/login", h.handleLogin).Methods("POST")
-	router.HandleFunc("/register", h.handleRegister).Methods("POST")
-	router.HandleFunc("/uploadProfile", h.handleProfileUpload).Methods("POST")
+	router.HandleFunc("/user/login", h.handleLogin).Methods("POST")
+	router.HandleFunc("/user/register", h.handleRegister).Methods("POST")
+	router.HandleFunc("/user/update", h.handleUpdateUser).Methods("POST")
+	router.HandleFunc("/user/uploadProfile", h.handleProfileUpload).Methods("POST")
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -109,6 +110,28 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "Registeration successful", "id": uId})
+
+}
+func (h *Handler) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	var payload types.UpdateUserPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		return
+	}
+
+	uId, err := h.store.UpdateUser(payload)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "Update successful", "id": uId})
 
 }
 func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {

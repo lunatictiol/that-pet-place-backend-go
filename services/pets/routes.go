@@ -10,7 +10,6 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/go-playground/validator"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/lunatictiol/that-pet-place-backend-go/types"
 	"github.com/lunatictiol/that-pet-place-backend-go/utils"
@@ -36,23 +35,18 @@ func NewHandler(store types.PetStore) *Handler {
 	}
 }
 func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/addPet", h.handleAddPet).Methods("POST")
-	router.HandleFunc("/getPetDetails", h.handleGetAllPets).Methods("Get")
-	router.HandleFunc("/getAllPets", h.handleGetAllPets).Methods("Get")
-	router.HandleFunc("/uploadPetProfile", h.handleProfileUpload).Methods("POST")
+	router.HandleFunc("/pet/addPet", h.handleAddPet).Methods("POST")
+	router.HandleFunc("/pet/getPetDetails", h.handleGetAllPets).Methods("Get")
+	router.HandleFunc("/pet/getAllPets", h.handleGetAllPets).Methods("Get")
+	router.HandleFunc("/pet/updatePet", h.handleUpdatePet).Methods("POST")
+	router.HandleFunc("/pet/uploadPetProfile", h.handleProfileUpload).Methods("POST")
 
 }
 
 func (h *Handler) handleGetAllPets(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("userID")
-	uid, err := uuid.Parse(userId)
-	if err != nil {
-		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error parsing id: %s", userId))
 
-		return
-	}
-
-	p, err := h.store.GetAllPets(uid)
+	p, err := h.store.GetAllPets(userId)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error retrieveing data of id: %s", userId))
 
@@ -79,17 +73,11 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	uid, err := uuid.Parse(payload.User_ID)
-	if err != nil {
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid user id %v", err))
-		fmt.Println(err)
-		return
-	}
 
 	uId, err := h.store.CreatePet(types.Pet{
 		Name:       payload.Name,
 		Gender:     payload.Gender,
-		User_ID:    uid,
+		User_ID:    payload.User_ID,
 		Dob:        payload.Dob,
 		Neutered:   payload.Neutered,
 		Breed:      payload.Breed,
@@ -98,11 +86,34 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 		Vaccinated: payload.Vaccinated,
 	})
 	if err != nil {
-		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
 		fmt.Println(err)
 		return
 	}
 	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "pet added successful", "id": uId})
+
+}
+func (h *Handler) handleUpdatePet(w http.ResponseWriter, r *http.Request) {
+	var payload types.UpdatePet
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println(err)
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println(err)
+		return
+	}
+
+	uId, err := h.store.UpdatePet(payload)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println(err)
+		return
+	}
+	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "pet updated successful", "id": uId})
 
 }
 func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {

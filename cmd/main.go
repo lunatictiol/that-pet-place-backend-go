@@ -25,8 +25,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	portString := fmt.Sprintf(":%s", config.Envs.Port)
-	apiServer.New(portString, userdb, petdb)
+
+	shopdb, err := db.NewMongoDbConnection(config.Envs.MongoURL)
+	fapp, err := config.InitFirebaseApp()
+
+	apiServer.New(portString, userdb, petdb, shopdb,fapp)
 	err = apiServer.Run()
 	if err != nil {
 		log.Fatal(err)
