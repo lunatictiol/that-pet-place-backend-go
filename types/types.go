@@ -30,7 +30,6 @@ type PetPayload struct {
 	Name       string `json:"name"`
 	Gender     string `json:"gender"`
 	User_ID    string `json:"user_id"`
-	Dob        string `json:"dob"`
 	Neutered   bool   `json:"neutered"`
 	Vaccinated bool   `json:"vaccinated"`
 	Breed      string `json:"breed"`
@@ -66,7 +65,6 @@ type Pet struct {
 	Name       string `json:"name"`
 	Gender     string `json:"gender"`
 	User_ID    string `json:"user_id"`
-	Dob        string `json:"dob"`
 	Neutered   bool   `json:"neutered"`
 	Breed      string `json:"breed"`
 	Species    string `json:"species"`
@@ -78,7 +76,6 @@ type UpdatePet struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Gender     string `json:"gender"`
-	Dob        string `json:"dob"`
 	Neutered   bool   `json:"neutered"`
 	Breed      string `json:"breed"`
 	Species    string `json:"species"`

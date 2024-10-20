@@ -20,7 +20,7 @@ func (s *Store) CreatePet(pet types.Pet) (string, error) {
 	if err == nil {
 		return "", fmt.Errorf("pet already exists with that name")
 	}
-	_, err = s.db.Exec("INSERT INTO pets (name, gender, user_id, dob,neutered,vaccinated,species,breed,age) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9)", pet.Name, pet.Gender, pet.User_ID, pet.Dob, pet.Neutered, pet.Vaccinated, pet.Species, pet.Breed, pet.Age)
+	_, err = s.db.Exec("INSERT INTO pets (name, gender, user_id,neutered,vaccinated,species,breed,age) VALUES ($1, $2, $3, $4,$5,$6,$7,$8)", pet.Name, pet.Gender, pet.User_ID, pet.Neutered, pet.Vaccinated, pet.Species, pet.Breed, pet.Age)
 	if err != nil {
 
 		return "", err
@@ -33,7 +33,7 @@ func (s *Store) CreatePet(pet types.Pet) (string, error) {
 	return p.ID, nil
 }
 func (s *Store) UpdatePet(pet types.UpdatePet) (string, error) {
-	_, err := s.db.Exec("UPDATE pets SET name=$1 , gender = $2, dob = $3,neutered= $4,vaccinated= $5,species= $6,breed= $7,age= $8 WHERE id =$9", pet.Name, pet.Gender, pet.Dob, pet.Neutered, pet.Vaccinated, pet.Species, pet.Breed, pet.Age, pet.ID)
+	_, err := s.db.Exec("UPDATE pets SET name=$1 , gender = $2,neutered= $3,vaccinated= $4,species= $5,breed= $6,age= $7 WHERE id =$8", pet.Name, pet.Gender, pet.Neutered, pet.Vaccinated, pet.Species, pet.Breed, pet.Age, pet.ID)
 	if err != nil {
 
 		return "", err
@@ -119,7 +119,6 @@ func (s *Store) GetAllPets(userId string) ([]types.Pet, error) {
 		pet := types.Pet{}
 		err = rows.Scan(&pet.Name,
 			&pet.Gender,
-			&pet.Dob,
 			&pet.Neutered,
 			&pet.Vaccinated,
 			&pet.Species,
@@ -147,7 +146,6 @@ func scanPetsFromRows(row *sql.Rows) (*types.Pet, error) {
 	err := row.Scan(
 		&pet.Name,
 		&pet.Gender,
-		&pet.Dob,
 		&pet.Neutered,
 		&pet.Vaccinated,
 		&pet.Species,

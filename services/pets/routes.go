@@ -96,7 +96,6 @@ func (h *Handler) handleAddPet(w http.ResponseWriter, r *http.Request) {
 		Name:       payload.Name,
 		Gender:     payload.Gender,
 		User_ID:    payload.User_ID,
-		Dob:        payload.Dob,
 		Neutered:   payload.Neutered,
 		Breed:      payload.Breed,
 		Species:    payload.Species,
