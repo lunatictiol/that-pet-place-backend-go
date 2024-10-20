@@ -26,6 +26,9 @@ func (s *Store) GetAllShops() ([]types.PetShop, error) {
 	collection := s.db.Database("PetServicesData").Collection("PetServices")
 	result, err := collection.Find(context.Background(), bson.D{})
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // No appointment found with the given id
+		}
 		return nil, err
 	}
 	var ps []types.PetShop
@@ -41,6 +44,9 @@ func (s *Store) GetShopDetails(id primitive.ObjectID) ([]types.PetShopDetails, e
 	collection := s.db.Database("PetServicesData").Collection("PetServices")
 	result, err := collection.Find(context.Background(), bson.D{{Key: "_id", Value: id}})
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // No appointment found with the given id
+		}
 		return nil, err
 	}
 	var ps []types.PetShopDetails

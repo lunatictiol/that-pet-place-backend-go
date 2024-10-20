@@ -27,7 +27,7 @@ func NewHandler(store types.ShopStore, firebaseApp *firebase.App) *Handler {
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/user/getPetShops", h.GetAllStores).Methods("Get")
 	router.HandleFunc("/user/getShopDetails", h.GetShopDetails).Methods("Get")
-	router.HandleFunc("/user/petShopsNearUser", h.GetStoresNearUser).Methods("Get")
+	router.HandleFunc("/user/petShopsNearUser", h.GetStoresNearUser).Methods("POST")
 	router.HandleFunc("/user/bookAppointment", h.BookAnAppointment).Methods("POST")
 	router.HandleFunc("/user/getAllAppointements", h.GetAllAppointmentsforUser).Methods("Get")
 	router.HandleFunc("/services/register", h.RegisterShop).Methods("POST")

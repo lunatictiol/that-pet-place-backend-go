@@ -100,7 +100,7 @@ type PetShop struct {
 	Tagline     string             `json:"tagline"`
 	Ratings     float64            `json:"ratings"`
 	Type        string             `json:"type"`
-	Services    Service            `json:"services"`
+	Services    []Service          `json:"services"`
 	Location    struct {
 		Type        string    `json:"type"`
 		Coordinates []float64 `json:"coordinates"`
