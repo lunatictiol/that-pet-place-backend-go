@@ -36,10 +36,28 @@ func NewHandler(store types.PetStore) *Handler {
 }
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/pet/addPet", h.handleAddPet).Methods("POST")
-	router.HandleFunc("/pet/getPetDetails", h.handleGetAllPets).Methods("Get")
+	router.HandleFunc("/pet/getPetDetails", h.handleGetPetDetails).Methods("Get")
 	router.HandleFunc("/pet/getAllPets", h.handleGetAllPets).Methods("Get")
 	router.HandleFunc("/pet/updatePet", h.handleUpdatePet).Methods("POST")
 	router.HandleFunc("/pet/uploadPetProfile", h.handleProfileUpload).Methods("POST")
+
+}
+
+func (h *Handler) handleGetPetDetails(w http.ResponseWriter, r *http.Request) {
+	userId := r.URL.Query().Get("petID")
+
+	p, err := h.store.FindPetById(userId)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error retrieveing data of id: %s", userId))
+
+		return
+	}
+	if p == nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("no pets found for id: %s", userId))
+		return
+
+	}
+	utils.WriteJson(w, http.StatusCreated, map[string]any{"message": "pet retrieved successfully", "pet": p})
 
 }
 
