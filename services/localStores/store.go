@@ -22,7 +22,7 @@ func NewStore(db *mongo.Client) *Store {
 }
 
 // get all shops
-func (s *Store) GetAllShops() ([]types.PetShop, error) {
+func (s *Store) GetAllShops() ([]types.PetShopDetails, error) {
 	collection := s.db.Database("PetServicesData").Collection("PetServices")
 	result, err := collection.Find(context.Background(), bson.D{})
 	if err != nil {
@@ -31,7 +31,7 @@ func (s *Store) GetAllShops() ([]types.PetShop, error) {
 		}
 		return nil, err
 	}
-	var ps []types.PetShop
+	var ps []types.PetShopDetails
 	err = result.All(context.Background(), &ps)
 	if err != nil {
 		return nil, err

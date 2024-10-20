@@ -177,19 +177,19 @@ type AppointmentPayload struct {
 }
 
 type Doctor struct {
-	Name              string   `bson:"name"`
-	Qualification     string   `bson:"qualification"`
-	Fees              float64  `bson:"fees"`                // Fees is stored as a float
-	AvailableDays     []string `bson:"available_days"`      // Available days is an array of strings
-	YearsOfExperience float64  `bson:"years_of_experience"` // Years of experience is stored as a float
-	Profile           string   `bson:"profile"`
+	Name              string   `json:"name"`
+	Qualification     string   `json:"qualification"`
+	Fees              float64  `json:"fees"`                // Fees is stored as a float
+	AvailableDays     []string `json:"available_days"`      // Available days is an array of strings
+	YearsOfExperience float64  `json:"years_of_experience"` // Years of experience is stored as a float
+	Profile           string   `json:"profile"`
 }
 
 type Product struct {
-	Name        string  `bson:"name"`
-	Photo       string  `bson:"photo"`
-	Price       float64 `bson:"price"` // Price is stored as a float
-	Description string  `bson:"description"`
+	Name        string  `json:"name"`
+	Photo       string  `json:"photo"`
+	Price       float64 `json:"price"` // Price is stored as a float
+	Description string  `json:"description"`
 }
 type UserStore interface {
 	FindUserByEmail(email string) (*User, error)
@@ -208,7 +208,7 @@ type PetStore interface {
 	UploadPetProfile(id string, profileUrl string) error
 }
 type ShopStore interface {
-	GetAllShops() ([]PetShop, error)
+	GetAllShops() ([]PetShopDetails, error)
 	GetServicesNearLocation(latitude float64, longitude float64) ([]PetShop, error)
 	GetShopDetails(id primitive.ObjectID) ([]PetShopDetails, error)
 	BookAppointment(ap AppointmentPayload) (Appointment, error)
