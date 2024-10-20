@@ -211,7 +211,7 @@ type PetStore interface {
 type ShopStore interface {
 	GetAllShops() ([]PetShopDetails, error)
 	GetServicesNearLocation(latitude float64, longitude float64) ([]PetShop, error)
-	GetShopDetails(id primitive.ObjectID) ([]PetShopDetails, error)
+	GetShopDetails(id primitive.ObjectID) (PetShopDetails, error)
 	BookAppointment(ap AppointmentPayload) (Appointment, error)
 	RegisterShop(rp RegisterShopPayload) (interface{}, error)
 	GetAllAppointments(id string) ([]Appointment, error)

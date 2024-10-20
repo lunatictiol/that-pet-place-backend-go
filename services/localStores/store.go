@@ -75,19 +75,14 @@ func (s *Store) GetAllShopsBasedOnService(filter string) ([]types.PetShopDetails
 }
 
 // shop details
-func (s *Store) GetShopDetails(id primitive.ObjectID) ([]types.PetShopDetails, error) {
+func (s *Store) GetShopDetails(id primitive.ObjectID) (types.PetShopDetails, error) {
 	collection := s.db.Database("PetServicesData").Collection("PetServices")
-	result, err := collection.Find(context.Background(), bson.D{{Key: "_id", Value: id}})
+	result := collection.FindOne(context.Background(), bson.D{{Key: "_id", Value: id}})
+
+	var ps types.PetShopDetails
+	err := result.Decode((&ps))
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, nil // No appointment found with the given id
-		}
-		return nil, err
-	}
-	var ps []types.PetShopDetails
-	err = result.All(context.Background(), &ps)
-	if err != nil {
-		return nil, err
+		return types.PetShopDetails{}, err
 	}
 	return ps, nil
 
