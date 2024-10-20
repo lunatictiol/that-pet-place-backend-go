@@ -98,26 +98,16 @@ func (s *Store) FindPetById(id string) (*types.Pet, error) {
 func (s *Store) GetAllPets(userId string) ([]types.Pet, error) {
 	rows, err := s.db.Query("SELECT * FROM pets WHERE user_id = $1", userId)
 	if err != nil {
+		println("WSX")
 		return nil, err
 	}
 	defer rows.Close()
 
-	columns, err := rows.Columns()
-	if err != nil {
-		return nil, err
-	}
-
-	values := make([]interface{}, len(columns))
-
-	scanArgs := make([]interface{}, len(values))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-
 	var results []types.Pet
 	for rows.Next() {
 		pet := types.Pet{}
-		err = rows.Scan(&pet.Name,
+		err = rows.Scan(
+			&pet.Name,
 			&pet.Gender,
 			&pet.Neutered,
 			&pet.Vaccinated,
@@ -128,6 +118,7 @@ func (s *Store) GetAllPets(userId string) ([]types.Pet, error) {
 			&pet.ID,
 			&pet.Age)
 		if err != nil {
+			println(err)
 			return nil, err
 		}
 
@@ -135,12 +126,21 @@ func (s *Store) GetAllPets(userId string) ([]types.Pet, error) {
 	}
 
 	if err := rows.Err(); err != nil {
+		println(err)
 		return nil, err
 	}
 
 	return results, nil
 }
+func (s *Store) DeletePet(petID string) (string, error) {
+	// Execute the SQL DELETE statement
+	_, err := s.db.Exec("DELETE FROM pets WHERE id = $1", petID)
+	if err != nil {
+		return "", err
+	}
 
+	return petID, nil
+}
 func scanPetsFromRows(row *sql.Rows) (*types.Pet, error) {
 	pet := new(types.Pet)
 	err := row.Scan(

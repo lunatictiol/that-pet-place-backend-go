@@ -63,10 +63,10 @@ func (h *Handler) handleGetPetDetails(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) handleGetAllPets(w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("userID")
-
+	println(userId)
 	p, err := h.store.GetAllPets(userId)
 	if err != nil {
-		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error retrieveing data of id: %s", userId))
+		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error retrieveing data of user id: %s", userId))
 
 		return
 	}
@@ -178,8 +178,9 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 		println(err)
 		return
 	}
+	publicURL := fmt.Sprintf("https://storage.cloud.google.com/%s/photos/%s", bucketName, handler.Filename)
 
-	u, err := url.Parse("/" + bucketName + "/" + sw.Attrs().Name)
+	u, err := url.Parse(publicURL)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, err)
 		println(err)
@@ -192,6 +193,6 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 		println(err)
 		return
 	}
-	utils.WriteJson(w, http.StatusCreated, map[string]string{"message": "upload successful", "url": u.Path})
+	utils.WriteJson(w, http.StatusCreated, map[string]string{"message": "upload successful", "url": publicURL})
 
 }

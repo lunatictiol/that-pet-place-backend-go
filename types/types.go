@@ -84,11 +84,13 @@ type UpdatePet struct {
 }
 
 type RegisterShopPayload struct {
-	Name        string `json:"name" validate:"required"`
-	Type        string `json:"type" validate:"required"`
-	PhoneNumber string `json:"phone_number" validate:"required"`
-	Email       string `json:"email" validate:"required,email"`
-	Password    string `json:"password" validate:"required,min=5,max=16" `
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=5,max=16" `
+}
+
+type Service struct {
+	Name  string `json:"name"`
+	Price int    `json:"price"`
 }
 
 type PetShop struct {
@@ -98,24 +100,17 @@ type PetShop struct {
 	Tagline     string             `json:"tagline"`
 	Ratings     float64            `json:"ratings"`
 	Type        string             `json:"type"`
-	Services    struct {
-		Grooming        int    `json:"grooming"`
-		VetinaryCheckup int    `json:"vetinary_checkup"`
-		PetBoarding     int    `json:"pet_boarding"`
-		Adoption        int    `json:"adoption"`
-		DogWalking      int    `json:"dog_walking"`
-		Training        int    `json:"training"`
-		PetTaxi         int    `json:"pet_taxi"`
-		Vaccination     int    `json:"vaccination"`
-		Other           string `json:"other"`
-	} `json:"services"`
-	Location struct {
+	Services    Service            `json:"services"`
+	Location    struct {
 		Type        string    `json:"type"`
 		Coordinates []float64 `json:"coordinates"`
 	} `json:"location"`
 	Distance float64
 }
-
+type Location struct {
+	Type        string    `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
+}
 type PetShopDetails struct {
 	ID          primitive.ObjectID `json:"id" bson:"_id"`
 	Name        string             `json:"name"`
@@ -123,28 +118,34 @@ type PetShopDetails struct {
 	Tagline     string             `json:"tagline"`
 	Ratings     float64            `json:"ratings"`
 	Type        string             `json:"type"`
-	Services    struct {
-		Grooming        int    `json:"grooming"`
-		VetinaryCheckup int    `json:"vetinary_checkup"`
-		PetBoarding     int    `json:"pet_boarding"`
-		Adoption        int    `json:"adoption"`
-		DogWalking      int    `json:"dog_walking"`
-		Training        int    `json:"training"`
-		PetTaxi         int    `json:"pet_taxi"`
-		Vaccination     int    `json:"vaccination"`
-		Other           string `json:"other"`
-	} `json:"services"`
-	Location struct {
-		Type        string    `json:"type"`
-		Coordinates []float64 `json:"coordinates"`
-	} `json:"location"`
-	Distance    float64
-	Doctors     []Doctor  `bson:"doctors"`
-	Address     string    `bson:"address"`
-	PhoneNumber string    `bson:"phone_number"`
-	Profile     string    `bson:"profile"`
-	Products    []Product `bson:"products"`
+	Services    []Service          `json:"services"`
+	Location    Location           `json:"location"`
+	Doctors     []Doctor           `json:"doctors"`
+	Address     string             `json:"address"`
+	PhoneNumber string             `json:"phone_number"`
+	Profile     string             `json:"profile"`
+	Products    []Product          `json:"products"`
+	RatingCount int64              `json:"rating_count"`
 }
+type AddPetShopDetailsPayload struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Tagline     string   `json:"tagline"`
+	Type        string   `json:"type"`
+	Location    Location `json:"location"`
+	Address     string   `json:"address"`
+	PhoneNumber string   `json:"phone_number"`
+}
+
+type AddPetShopProductPayload struct {
+	Id      string  `json:"id`
+	Product Product `json:"product"`
+}
+type AddPetShopDoctorPayload struct {
+	Id     string `json:"id`
+	Doctor Doctor `json:"doctor"`
+}
+
 type Appointment struct {
 	ID                  primitive.ObjectID `bson:"_id"`
 	DoctorName          string             `bson:"doctor_name"`
@@ -211,6 +212,9 @@ type ShopStore interface {
 	GetServicesNearLocation(latitude float64, longitude float64) ([]PetShop, error)
 	GetShopDetails(id primitive.ObjectID) ([]PetShopDetails, error)
 	BookAppointment(ap AppointmentPayload) (Appointment, error)
+	RegisterShop(rp RegisterShopPayload) (interface{}, error)
+	GetAllAppointments(id string) ([]Appointment, error)
+	GetAllAppointmentsForStore(id string) ([]Appointment, error)
 }
 
 type Manager struct {
