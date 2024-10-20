@@ -126,6 +126,7 @@ type PetShopDetails struct {
 	Profile     string             `json:"profile"`
 	Products    []Product          `json:"products"`
 	RatingCount int64              `json:"rating_count"`
+	Distance    float64            `json:"distance"`
 }
 type AddPetShopDetailsPayload struct {
 	Name        string   `json:"name"`
