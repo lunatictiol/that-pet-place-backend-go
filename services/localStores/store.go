@@ -39,6 +39,41 @@ func (s *Store) GetAllShops() ([]types.PetShopDetails, error) {
 	return ps, nil
 }
 
+// filterd
+func (s *Store) GetAllShopsBasedOnService(filter string) ([]types.PetShopDetails, error) {
+	collection := s.db.Database("PetServicesData").Collection("PetServices")
+
+	// Find all pet shops
+	result, err := collection.Find(context.Background(), bson.D{})
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // No pet shops found
+		}
+		return nil, err
+	}
+
+	var ps []types.PetShopDetails
+	err = result.All(context.Background(), &ps)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter pet shops that offer the specific service
+	var filteredShops []types.PetShopDetails
+	for _, shop := range ps {
+		for _, service := range shop.Services {
+			if service.Name == filter {
+				filteredShops = append(filteredShops, shop)
+				break
+			}
+		}
+	}
+
+	// Return the filtered pet shops
+	return filteredShops, nil
+
+}
+
 // shop details
 func (s *Store) GetShopDetails(id primitive.ObjectID) ([]types.PetShopDetails, error) {
 	collection := s.db.Database("PetServicesData").Collection("PetServices")

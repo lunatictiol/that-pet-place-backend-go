@@ -216,6 +216,7 @@ type ShopStore interface {
 	RegisterShop(rp RegisterShopPayload) (interface{}, error)
 	GetAllAppointments(id string) ([]Appointment, error)
 	GetAllAppointmentsForStore(id string) ([]Appointment, error)
+	GetAllShopsBasedOnService(filter string) ([]PetShopDetails, error)
 }
 
 type Manager struct {

@@ -30,6 +30,8 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/user/petShopsNearUser", h.GetStoresNearUser).Methods("POST")
 	router.HandleFunc("/user/bookAppointment", h.BookAnAppointment).Methods("POST")
 	router.HandleFunc("/user/getAllAppointements", h.GetAllAppointmentsforUser).Methods("Get")
+	router.HandleFunc("/user/getShopsFromService", h.GetAllStoresBasedOnService).Methods("Get")
+
 	router.HandleFunc("/services/register", h.RegisterShop).Methods("POST")
 
 }
@@ -37,6 +39,16 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 func (h *Handler) GetAllStores(w http.ResponseWriter, r *http.Request) {
 
 	ps, err := h.store.GetAllShops()
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error: %s", err))
+		return
+	}
+	utils.WriteJson(w, http.StatusOK, ps)
+
+}
+func (h *Handler) GetAllStoresBasedOnService(w http.ResponseWriter, r *http.Request) {
+	filter := r.URL.Query().Get("filter")
+	ps, err := h.store.GetAllShopsBasedOnService(filter)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error: %s", err))
 		return
