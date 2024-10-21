@@ -393,6 +393,21 @@ func (s *Store) AddStorePetShopDetails(payload types.AddPetShopDetails) (string,
 	return fmt.Sprintf("%v", insertedID), nil
 
 }
+func (s *Store) UpdateStorePetShopDetails(payload types.AddPetShopDetails) (string, error) {
+	// Insert the payload into the PetServices collection
+	collection := s.db.Database("PetServicesData").Collection("PetServices")
+	update := bson.M{
+		"$set": bson.M{"name": payload.Name, "address": payload.Address, "phone_number": payload.PhoneNumber, "description": payload.Description, "tagline": payload.Tagline},
+	}
+	result, err := collection.UpdateOne(context.Background(), bson.D{{Key: "_id", Value: payload.Id}}, update)
+	if err != nil {
+		print("HHHHHH")
+		return "", err
+	}
+
+	return fmt.Sprintf("%v", result.UpsertedID), nil
+
+}
 
 //add service
 

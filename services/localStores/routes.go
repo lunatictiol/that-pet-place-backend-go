@@ -36,6 +36,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/services/register", h.RegisterShop).Methods("POST")
 	router.HandleFunc("/services/login", h.LoginShop).Methods("POST")
 	router.HandleFunc("/services/addShopData", h.AddShopData).Methods("POST")
+	router.HandleFunc("/services/UpdateShopData", h.UpdateShopData).Methods("POST")
 	router.HandleFunc("/services/getAllAppointements", h.GetAllAppointmentsforStore).Methods("Get")
 	router.HandleFunc("/services/addService", h.AddShopService).Methods("POST")
 	router.HandleFunc("/services/addDoctor", h.AddShopDoctor).Methods("POST")
@@ -213,6 +214,45 @@ func (h *Handler) LoginShop(w http.ResponseWriter, r *http.Request) {
 
 }
 func (h *Handler) AddShopData(w http.ResponseWriter, r *http.Request) {
+	var payload types.AddPetShopDetailsPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+	objectId, err := primitive.ObjectIDFromHex(payload.Id)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("id error")
+		return
+	}
+	shopDetails := types.AddPetShopDetails{
+		Name:        payload.Name,
+		Description: payload.Description,
+		Tagline:     payload.Tagline,
+		Type:        payload.Type,
+		Id:          objectId,
+		Address:     payload.Address,
+		PhoneNumber: payload.PhoneNumber,
+	}
+	s, err := h.store.AddStorePetShopDetails(shopDetails)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "added successful", "id": s})
+
+}
+func (h *Handler) UpdateShopData(w http.ResponseWriter, r *http.Request) {
 	var payload types.AddPetShopDetailsPayload
 	if err := utils.ParseJson(r, &payload); err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, err)

@@ -206,9 +206,9 @@ type AppointmentPayload struct {
 type Doctor struct {
 	Name              string   `json:"name"`
 	Qualification     string   `json:"qualification"`
-	Fees              float64  `json:"fees"`                // Fees is stored as a float
-	AvailableDays     []string `json:"available_days"`      // Available days is an array of strings
-	YearsOfExperience float64  `json:"years_of_experience"` // Years of experience is stored as a float
+	Fees              float64  `json:"fees"`                                           // Fees is stored as a float
+	AvailableDays     []string `json:"available_days" bson:"available_days"`           // Available days is an array of strings
+	YearsOfExperience float64  `json:"years_of_experience" bson:"years_of_experience"` // Years of experience is stored as a float
 }
 type AddDoctorPayload struct {
 	Id                string   `json:"store_id"`
@@ -247,6 +247,7 @@ type ShopStore interface {
 	GetServicesNearLocation(latitude float64, longitude float64) ([]PetShop, error)
 	GetShopDetails(id primitive.ObjectID) (PetShopDetails, error)
 	BookAppointment(ap AppointmentPayload) (Appointment, error)
+	UpdateStorePetShopDetails(payload AddPetShopDetails) (string, error)
 	RegisterShop(rp RegisterShopPayload) (interface{}, error)
 
 	GetAllAppointments(id string) ([]Appointment, error)
