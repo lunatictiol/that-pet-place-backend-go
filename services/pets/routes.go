@@ -72,7 +72,7 @@ func (h *Handler) handleGetAllPets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if p == nil {
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("no pets found for id: %s", userId))
+		utils.WriteJson(w, http.StatusOK, map[string]any{"message": "no pets", "pets": p})
 		return
 
 	}

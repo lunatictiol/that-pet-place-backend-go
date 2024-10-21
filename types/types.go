@@ -158,10 +158,6 @@ type AddPetShopDetails struct {
 	Id          primitive.ObjectID `json:"auth_id"`
 }
 
-type AddPetShopDoctorPayload struct {
-	ID     string `json:"id"`
-	Doctor Doctor `json:"doctor"`
-}
 type AddPetShopLocationPayload struct {
 	ID        string  `json:"id"`
 	Longitude float64 `json:"longitude"`
