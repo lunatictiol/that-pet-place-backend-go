@@ -36,6 +36,13 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/services/register", h.RegisterShop).Methods("POST")
 	router.HandleFunc("/services/login", h.LoginShop).Methods("POST")
 	router.HandleFunc("/services/addShopData", h.AddShopData).Methods("POST")
+	router.HandleFunc("/services/getAllAppointements", h.GetAllAppointmentsforStore).Methods("Get")
+	router.HandleFunc("/services/addService", h.AddShopService).Methods("POST")
+	router.HandleFunc("/services/addDoctor", h.AddShopDoctor).Methods("POST")
+
+	router.HandleFunc("/services/addLocation", h.AddShopLocation).Methods("POST")
+	router.HandleFunc("/services/appointments/confirmation", h.UpdateAppointmentConfirmation).Methods("POST")
+	router.HandleFunc("/appointments/status", h.ChangeStatusOfAppointment).Methods("POST")
 
 }
 
@@ -71,7 +78,7 @@ func (h *Handler) GetAllAppointmentsforUser(w http.ResponseWriter, r *http.Reque
 }
 func (h *Handler) GetAllAppointmentsforStore(w http.ResponseWriter, r *http.Request) {
 	idString := r.URL.Query().Get("storeID")
-	ap, err := h.store.GetAllAppointments(idString)
+	ap, err := h.store.GetAllAppointmentsForStore(idString)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusInternalServerError, fmt.Errorf("error: %s", err))
 		return
@@ -221,7 +228,7 @@ func (h *Handler) AddShopData(w http.ResponseWriter, r *http.Request) {
 	objectId, err := primitive.ObjectIDFromHex(payload.Id)
 	if err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
-		fmt.Println("validation error")
+		fmt.Println("id error")
 		return
 	}
 	shopDetails := types.AddPetShopDetails{
@@ -242,6 +249,141 @@ func (h *Handler) AddShopData(w http.ResponseWriter, r *http.Request) {
 
 	//send store request
 	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "added successful", "id": s})
+
+}
+func (h *Handler) AddShopService(w http.ResponseWriter, r *http.Request) {
+	var payload types.AddServicePayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+	fmt.Println("DETAILS", payload.Name)
+
+	shopDetails := types.Service{
+		Name:  payload.Name,
+		Price: payload.Price,
+	}
+	err := h.store.AddService(payload.ID, shopDetails)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "added successful"})
+
+}
+func (h *Handler) AddShopDoctor(w http.ResponseWriter, r *http.Request) {
+	var payload types.AddDoctorPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+	fmt.Println("DETAILS", payload.Name)
+
+	doctor := types.Doctor{
+		Name:              payload.Name,
+		Qualification:     payload.Qualification,
+		Fees:              payload.Fees,
+		AvailableDays:     payload.AvailableDays,
+		YearsOfExperience: payload.YearsOfExperience,
+	}
+	err := h.store.AddDoctor(payload.Id, doctor)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "added successful"})
+
+}
+func (h *Handler) AddShopLocation(w http.ResponseWriter, r *http.Request) {
+	var payload types.AddPetShopLocationPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+
+	err := h.store.AddLocation(payload.ID, payload.Longitude, payload.Latitude)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "added successful"})
+
+}
+
+func (h *Handler) UpdateAppointmentConfirmation(w http.ResponseWriter, r *http.Request) {
+	var payload types.AppointmentClicnicApprovalPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+	err := h.store.UpdateAppointmentConfirmation(payload)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "confirmation done"})
+
+}
+func (h *Handler) ChangeStatusOfAppointment(w http.ResponseWriter, r *http.Request) {
+	var payload types.AppointmentStatusPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+	err := h.store.UpdateAppointmentStatus(payload)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "status changed"})
 
 }
 

@@ -98,6 +98,11 @@ type Service struct {
 	Name  string `json:"name"`
 	Price int    `json:"price"`
 }
+type AddServicePayload struct {
+	Name  string `json:"name"`
+	Price int    `json:"price"`
+	ID    string `json:"id"`
+}
 
 type PetShop struct {
 	ID          primitive.ObjectID `json:"id" bson:"_id"`
@@ -153,13 +158,14 @@ type AddPetShopDetails struct {
 	Id          primitive.ObjectID `json:"auth_id"`
 }
 
-type AddPetShopProductPayload struct {
-	Id      string  `json:"id`
-	Product Product `json:"product"`
-}
 type AddPetShopDoctorPayload struct {
-	Id     string `json:"id`
+	ID     string `json:"id"`
 	Doctor Doctor `json:"doctor"`
+}
+type AddPetShopLocationPayload struct {
+	ID        string  `json:"id"`
+	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude"`
 }
 
 type Appointment struct {
@@ -177,9 +183,18 @@ type Appointment struct {
 	Confirmation        string             `bson:"confirmation"`
 	Confirmed           bool               `bson:"confirmed"`
 }
-type AppointmentClicnicApproval struct {
-	ID    primitive.ObjectID `bson:"_id"`
-	Price float64            `bson:"price"`
+type AppointmentClicnicApprovalPayload struct {
+	ID           string `json:"id"`
+	Confirm      bool   `json:"Confirm"`
+	Confirmation string `json:"Confirmation"`
+}
+type AppointmentStatusPayload struct {
+	ID     string `json:"id"`
+	Status string `json:"status"`
+}
+type StoreRatingsPayload struct {
+	ID     string  `json:"id"`
+	Rating float64 `json:"rating"`
 }
 type AppointmentPayload struct {
 	DoctorName          string  `json:"doctor_name"`
@@ -198,7 +213,14 @@ type Doctor struct {
 	Fees              float64  `json:"fees"`                // Fees is stored as a float
 	AvailableDays     []string `json:"available_days"`      // Available days is an array of strings
 	YearsOfExperience float64  `json:"years_of_experience"` // Years of experience is stored as a float
-	Profile           string   `json:"profile"`
+}
+type AddDoctorPayload struct {
+	Id                string   `json:"store_id"`
+	Name              string   `json:"name"`
+	Qualification     string   `json:"qualification"`
+	Fees              float64  `json:"fees"`                // Fees is stored as a float
+	AvailableDays     []string `json:"available_days"`      // Available days is an array of strings
+	YearsOfExperience float64  `json:"years_of_experience"` // Years of experience is stored as a float
 }
 
 type Product struct {
@@ -229,11 +251,18 @@ type ShopStore interface {
 	GetShopDetails(id primitive.ObjectID) (PetShopDetails, error)
 	BookAppointment(ap AppointmentPayload) (Appointment, error)
 	RegisterShop(rp RegisterShopPayload) (interface{}, error)
+
 	GetAllAppointments(id string) ([]Appointment, error)
 	GetAllAppointmentsForStore(id string) ([]Appointment, error)
 	GetAllShopsBasedOnService(filter string) ([]PetShopDetails, error)
 	CheckIfEmailExisits(email string) (ShopAuthPayload, error)
+
 	AddStorePetShopDetails(payload AddPetShopDetails) (string, error)
+	AddService(petShopId string, service Service) error
+	AddDoctor(petShopId string, doctor Doctor) error
+	AddLocation(petShopId string, long, lat float64) error
+	UpdateAppointmentStatus(AppointmentStatusPayload) error
+	UpdateAppointmentConfirmation(AppointmentClicnicApprovalPayload) error
 }
 
 type Manager struct {

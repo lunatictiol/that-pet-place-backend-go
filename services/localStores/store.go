@@ -231,11 +231,11 @@ func (s *Store) GetAllAppointmentsForStore(id string) ([]types.Appointment, erro
 	}
 	return ap, nil
 }
-func (s *Store) UpdateAppointmentConfirmation(id string, price int64, confirmed bool) (types.Appointment, error) {
+func (s *Store) UpdateAppointmentConfirmation(ap types.AppointmentClicnicApprovalPayload) error {
 	// Convert the string id to a MongoDB ObjectID
-	objectId, err := primitive.ObjectIDFromHex(id)
+	objectId, err := primitive.ObjectIDFromHex(ap.ID)
 	if err != nil {
-		return types.Appointment{}, err
+		return err
 	}
 
 	// Get the appointments collection
@@ -249,36 +249,36 @@ func (s *Store) UpdateAppointmentConfirmation(id string, price int64, confirmed 
 	err = collection.FindOne(context.Background(), filter).Decode(&appointment)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return types.Appointment{}, nil // No appointment found with the given id
+			return nil // No appointment found with the given id
 		}
-		return types.Appointment{}, err
+		return err
 	}
 
 	// Update the "confirmed" field of the appointment
 	update := bson.M{
-		"$set": bson.M{"confirmed": confirmed, "confirmation": "done", "price": price},
+		"$set": bson.M{"confirmed": ap.Confirm, "confirmation": ap.Confirmation},
 	}
 
 	// Update the document
 	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		return types.Appointment{}, err
+		return err
 	}
 
 	// Optionally, you can return the updated appointment by fetching it again
 	err = collection.FindOne(context.Background(), filter).Decode(&appointment)
 	if err != nil {
-		return types.Appointment{}, err
+		return err
 	}
 
-	return appointment, nil
+	return nil
 }
 
-func (s *Store) UpdateAppointmentStatus(id string, status string) (types.Appointment, error) {
+func (s *Store) UpdateAppointmentStatus(ap types.AppointmentStatusPayload) error {
 	// Convert the string id to a MongoDB ObjectID
-	objectId, err := primitive.ObjectIDFromHex(id)
+	objectId, err := primitive.ObjectIDFromHex(ap.ID)
 	if err != nil {
-		return types.Appointment{}, err
+		return err
 	}
 
 	// Get the appointments collection
@@ -292,36 +292,36 @@ func (s *Store) UpdateAppointmentStatus(id string, status string) (types.Appoint
 	err = collection.FindOne(context.Background(), filter).Decode(&appointment)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return types.Appointment{}, nil // No appointment found with the given id
+			return nil // No appointment found with the given id
 		}
-		return types.Appointment{}, err
+		return err
 	}
 
 	// Update the "confirmed" field of the appointment
 	update := bson.M{
-		"$set": bson.M{"status": status},
+		"$set": bson.M{"status": ap.Status},
 	}
 
 	// Update the document
 	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		return types.Appointment{}, err
+		return err
 	}
 
 	// Optionally, you can return the updated appointment by fetching it again
 	err = collection.FindOne(context.Background(), filter).Decode(&appointment)
 	if err != nil {
-		return types.Appointment{}, err
+		return err
 	}
 
-	return appointment, nil
+	return nil
 }
 
 //send ratings
 
-func (s *Store) UpdateShopRating(petShopId string, newRating float64) error {
+func (s *Store) UpdateShopRating(rp types.StoreRatingsPayload) error {
 	// Convert string ID to ObjectID
-	objectId, err := primitive.ObjectIDFromHex(petShopId)
+	objectId, err := primitive.ObjectIDFromHex(rp.ID)
 	if err != nil {
 		return err
 	}
@@ -343,7 +343,7 @@ func (s *Store) UpdateShopRating(petShopId string, newRating float64) error {
 	// Calculate new average rating
 	oldRating := petShop.Ratings
 	oldRatingCount := petShop.RatingCount
-	newAverageRating := ((oldRating * float64(oldRatingCount)) + newRating) / float64(oldRatingCount+1)
+	newAverageRating := ((oldRating * float64(oldRatingCount)) + rp.Rating) / float64(oldRatingCount+1)
 
 	// Increment the rating count
 	newRatingCount := oldRatingCount + 1
@@ -370,8 +370,6 @@ func (s *Store) UpdateShopRating(petShopId string, newRating float64) error {
 	return nil
 }
 
-//login clinic
-
 // add clinic details
 func (s *Store) AddStorePetShopDetails(payload types.AddPetShopDetails) (string, error) {
 	// Insert the payload into the PetServices collection
@@ -396,8 +394,95 @@ func (s *Store) AddStorePetShopDetails(payload types.AddPetShopDetails) (string,
 
 }
 
-//add doctor
+//add service
 
-//add product
+func (s *Store) AddService(petShopId string, service types.Service) error {
+	// Convert string ID to ObjectID
+	objectId, err := primitive.ObjectIDFromHex(petShopId)
+	if err != nil {
+		println("heree")
+		return err
+	}
+
+	// Get the pet shops collection
+	collection := s.db.Database("PetServicesData").Collection("PetServices")
+
+	filter := bson.M{"_id": objectId} // Assuming you want to match by the shop ID
+	update := bson.M{
+		"$push": bson.M{
+			"services": service,
+		},
+	}
+
+	// Execute the update operation
+	_, err = collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		println("or hereeee")
+		return fmt.Errorf("failed to add service: %v", err)
+	}
+
+	return nil
+}
+
+// add doctor
+func (s *Store) AddDoctor(petShopId string, doctor types.Doctor) error {
+	// Convert string ID to ObjectID
+	objectId, err := primitive.ObjectIDFromHex(petShopId)
+	if err != nil {
+		println("heree")
+		return err
+	}
+
+	// Get the pet shops collection
+	collection := s.db.Database("PetServicesData").Collection("PetServices")
+
+	filter := bson.M{"_id": objectId} // Assuming you want to match by the shop ID
+	update := bson.M{
+		"$push": bson.M{
+			"doctors": doctor,
+		},
+	}
+
+	// Execute the update operation
+	_, err = collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		println("or hereeee")
+		return fmt.Errorf("failed to add service: %v", err)
+	}
+
+	return nil
+}
+
+// add store locations
+func (s *Store) AddLocation(petShopId string, long, lat float64) error {
+	// Convert string ID to ObjectID
+	objectId, err := primitive.ObjectIDFromHex(petShopId)
+	if err != nil {
+		println("heree")
+		return err
+	}
+
+	// Get the pet shops collection
+	collection := s.db.Database("PetServicesData").Collection("PetServices")
+
+	filter := bson.M{"_id": objectId} // Assuming you want to match by the shop ID
+	update := bson.M{
+		"$set": bson.M{
+			"location": bson.M{
+				"type":        "Point",
+				"coordinates": []float64{lat, long},
+			},
+		},
+	}
+
+	// Execute the update operation
+	_, err = collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		println("or hereeee")
+		return fmt.Errorf("failed to add service: %v", err)
+	}
+
+	return nil
+}
 
 //add clicnic profile photo
