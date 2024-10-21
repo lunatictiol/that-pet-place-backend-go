@@ -41,8 +41,8 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/services/addDoctor", h.AddShopDoctor).Methods("POST")
 
 	router.HandleFunc("/services/addLocation", h.AddShopLocation).Methods("POST")
-	router.HandleFunc("/services/appointments/confirmation", h.UpdateAppointmentConfirmation).Methods("POST")
-	router.HandleFunc("/appointments/status", h.ChangeStatusOfAppointment).Methods("POST")
+	router.HandleFunc("/services/appointment/confirmation", h.UpdateAppointmentConfirmation).Methods("POST")
+	router.HandleFunc("/appointment/status", h.ChangeStatusOfAppointment).Methods("POST")
 
 }
 
