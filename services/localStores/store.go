@@ -184,6 +184,19 @@ func (s *Store) RegisterShop(rp types.RegisterShopPayload) (interface{}, error) 
 
 }
 
+func (s *Store) CheckIfEmailExisits(email string) (types.ShopAuthPayload, error) {
+
+	psa := s.db.Database("PetServicesData").Collection("PetServicesAuth")
+	var store types.ShopAuthPayload
+	err := psa.FindOne(context.Background(), bson.D{{Key: "email", Value: email}}).Decode(&store)
+	if err != nil {
+
+		return types.ShopAuthPayload{}, err
+	}
+	return store, nil
+
+}
+
 // get user apponitments
 func (s *Store) GetAllAppointments(id string) ([]types.Appointment, error) {
 	collection := s.db.Database("PetServicesData").Collection("appointments")
@@ -359,7 +372,29 @@ func (s *Store) UpdateShopRating(petShopId string, newRating float64) error {
 
 //login clinic
 
-//add clinic details
+// add clinic details
+func (s *Store) AddStorePetShopDetails(payload types.AddPetShopDetails) (string, error) {
+	// Insert the payload into the PetServices collection
+
+	insertResult, err := s.db.Database("PetServicesData").Collection("PetServices").InsertOne(context.Background(), payload)
+	if err != nil {
+		return "", fmt.Errorf("failed to insert into PetServices: %v", err)
+	}
+	insertedID := insertResult.InsertedID
+	psa := s.db.Database("PetServicesData").Collection("PetServicesAuth")
+
+	filter := bson.M{"_id": payload.Id}
+	update := bson.M{
+		"$set": bson.M{"store_id": insertedID},
+	}
+	_, err = psa.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		print("HHHHHH")
+		return "", err
+	}
+	return fmt.Sprintf("%v", insertedID), nil
+
+}
 
 //add doctor
 

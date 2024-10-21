@@ -10,6 +10,7 @@ import (
 	localstores "github.com/lunatictiol/that-pet-place-backend-go/services/localStores"
 	"github.com/lunatictiol/that-pet-place-backend-go/services/pets"
 	"github.com/lunatictiol/that-pet-place-backend-go/services/users"
+	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -48,5 +49,6 @@ func (a *ApiServer) Run() error {
 	localStoreHandler.RegisterRoutes(subRouter)
 
 	log.Println("listening on port", a.address)
-	return http.ListenAndServe(a.address, router)
+	handler := cors.Default().Handler(router)
+	return http.ListenAndServe(a.address, handler)
 }

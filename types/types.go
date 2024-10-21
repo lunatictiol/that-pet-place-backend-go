@@ -87,6 +87,12 @@ type RegisterShopPayload struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=5,max=16" `
 }
+type ShopAuthPayload struct {
+	AuthID   string `json:"id" bson:"_id"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=5,max=16" `
+	ID       string `json:"id" bson:"store_id"`
+}
 
 type Service struct {
 	Name  string `json:"name"`
@@ -129,13 +135,22 @@ type PetShopDetails struct {
 	Distance    float64            `json:"distance"`
 }
 type AddPetShopDetailsPayload struct {
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Tagline     string   `json:"tagline"`
-	Type        string   `json:"type"`
-	Location    Location `json:"location"`
-	Address     string   `json:"address"`
-	PhoneNumber string   `json:"phone_number"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Tagline     string `json:"tagline"`
+	Type        string `json:"type"`
+	Address     string `json:"address"`
+	PhoneNumber string `json:"phone_number"`
+	Id          string `json:"auth_id"`
+}
+type AddPetShopDetails struct {
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Tagline     string             `json:"tagline"`
+	Type        string             `json:"type"`
+	Address     string             `json:"address"`
+	PhoneNumber string             `json:"phone_number"`
+	Id          primitive.ObjectID `json:"auth_id"`
 }
 
 type AddPetShopProductPayload struct {
@@ -153,7 +168,7 @@ type Appointment struct {
 	DoctorQualification string             `bson:"doctor_qualification"`
 	ClinicName          string             `bson:"clinic_name"`
 	ClinicAddress       string             `bson:"clinic_address"`
-	AppointmentDate     time.Time          `bson:"appointment_date"`
+	AppointmentDate     string             `bson:"appointment_date"`
 	Status              string             `bson:"status"`
 	Price               float64            `bson:"price"`
 	PetName             string             `bson:"pet_name"`
@@ -167,14 +182,14 @@ type AppointmentClicnicApproval struct {
 	Price float64            `bson:"price"`
 }
 type AppointmentPayload struct {
-	DoctorName          string    `json:"doctor_name"`
-	AppointmentDate     time.Time `json:"appointment_date"`
-	PetName             string    `json:"pet_name"`
-	UserID              string    `json:"user_id"`
-	CLinicID            string    `json:"clinic_id"`
-	Status              string    `json:"status"`
-	DoctorQualification string    `bson:"doctor_qualification"`
-	Price               float64   `bson:"price"`
+	DoctorName          string  `json:"doctor_name"`
+	AppointmentDate     string  `json:"appointment_date"`
+	PetName             string  `json:"pet_name"`
+	UserID              string  `json:"user_id"`
+	CLinicID            string  `json:"clinic_id"`
+	Status              string  `json:"status"`
+	DoctorQualification string  `bson:"doctor_qualification"`
+	Price               float64 `bson:"price"`
 }
 
 type Doctor struct {
@@ -217,6 +232,8 @@ type ShopStore interface {
 	GetAllAppointments(id string) ([]Appointment, error)
 	GetAllAppointmentsForStore(id string) ([]Appointment, error)
 	GetAllShopsBasedOnService(filter string) ([]PetShopDetails, error)
+	CheckIfEmailExisits(email string) (ShopAuthPayload, error)
+	AddStorePetShopDetails(payload AddPetShopDetails) (string, error)
 }
 
 type Manager struct {

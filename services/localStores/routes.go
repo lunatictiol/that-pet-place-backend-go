@@ -24,6 +24,7 @@ func NewHandler(store types.ShopStore, firebaseApp *firebase.App) *Handler {
 		firebaseApp: firebaseApp,
 	}
 }
+
 func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/user/getPetShops", h.GetAllStores).Methods("Get")
 	router.HandleFunc("/user/getShopDetails", h.GetShopDetails).Methods("Get")
@@ -33,6 +34,8 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/user/getShopsFromService", h.GetAllStoresBasedOnService).Methods("Get")
 
 	router.HandleFunc("/services/register", h.RegisterShop).Methods("POST")
+	router.HandleFunc("/services/login", h.LoginShop).Methods("POST")
+	router.HandleFunc("/services/addShopData", h.AddShopData).Methods("POST")
 
 }
 
@@ -141,6 +144,7 @@ func (h *Handler) BookAnAppointment(w http.ResponseWriter, r *http.Request) {
 
 }
 func (h *Handler) RegisterShop(w http.ResponseWriter, r *http.Request) {
+
 	var payload types.RegisterShopPayload
 	if err := utils.ParseJson(r, &payload); err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, err)
@@ -149,7 +153,7 @@ func (h *Handler) RegisterShop(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := utils.Validator.Struct(payload); err != nil {
 		error := err.(validator.ValidationErrors)
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		utils.WriteJsonError(w, http.StatusBadRequest, error)
 		fmt.Println(err)
 		return
 	}
@@ -161,15 +165,16 @@ func (h *Handler) RegisterShop(w http.ResponseWriter, r *http.Request) {
 	payload.Password = hashedPassword
 	ap, err := h.store.RegisterShop(payload)
 	if err != nil {
-		println("hereeee")
-		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
 		return
 	}
 	//send store request
+	print("DONE REGISTER")
 	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "Registeration successful", "id": ap})
 
 }
-func (h *Handler) AddShopData(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) LoginShop(w http.ResponseWriter, r *http.Request) {
+
 	var payload types.RegisterShopPayload
 	if err := utils.ParseJson(r, &payload); err != nil {
 		utils.WriteJsonError(w, http.StatusBadRequest, err)
@@ -178,24 +183,65 @@ func (h *Handler) AddShopData(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := utils.Validator.Struct(payload); err != nil {
 		error := err.(validator.ValidationErrors)
-		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		utils.WriteJsonError(w, http.StatusBadRequest, error)
 		fmt.Println(err)
 		return
 	}
-	hashedPassword, err := auth.HashPassword(payload.Password)
+	store, err := h.store.CheckIfEmailExisits(payload.Email)
 	if err != nil {
-		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println(err)
 		return
 	}
-	payload.Password = hashedPassword
-	ap, err := h.store.RegisterShop(payload)
-	if err != nil {
-		println("hereeee")
-		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+	p := auth.ValidatePassword(payload.Password, store.Password)
+	if !p {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println(err)
 		return
 	}
+
 	//send store request
-	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "Registeration successful", "id": ap})
+	print("DONE Login")
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "Registeration successful", "auth_id": store.AuthID, "store_id": store.ID})
+
+}
+func (h *Handler) AddShopData(w http.ResponseWriter, r *http.Request) {
+	var payload types.AddPetShopDetailsPayload
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, err)
+		fmt.Println("cant parss")
+		return
+	}
+	if err := utils.Validator.Struct(payload); err != nil {
+		error := err.(validator.ValidationErrors)
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", error))
+		fmt.Println("validation error")
+		return
+	}
+	objectId, err := primitive.ObjectIDFromHex(payload.Id)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("validation error")
+		return
+	}
+	shopDetails := types.AddPetShopDetails{
+		Name:        payload.Name,
+		Description: payload.Description,
+		Tagline:     payload.Tagline,
+		Type:        payload.Type,
+		Id:          objectId,
+		Address:     payload.Address,
+		PhoneNumber: payload.PhoneNumber,
+	}
+	s, err := h.store.AddStorePetShopDetails(shopDetails)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", err))
+		fmt.Println("add to store error")
+		return
+	}
+
+	//send store request
+	utils.WriteJson(w, http.StatusOK, map[string]any{"message": "added successful", "id": s})
 
 }
 
