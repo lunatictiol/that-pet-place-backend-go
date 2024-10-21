@@ -133,10 +133,10 @@ type PetShopDetails struct {
 	Location    Location           `json:"location"`
 	Doctors     []Doctor           `json:"doctors"`
 	Address     string             `json:"address"`
-	PhoneNumber string             `json:"phone_number"`
+	PhoneNumber string             `json:"phone_number" bson:"phone_number"`
 	Profile     string             `json:"profile"`
 	Products    []Product          `json:"products"`
-	RatingCount int64              `json:"rating_count"`
+	RatingCount int64              `json:"rating_count" bson:"rating_count"`
 	Distance    float64            `json:"distance"`
 }
 type AddPetShopDetailsPayload struct {
