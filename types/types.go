@@ -244,6 +244,7 @@ type PetStore interface {
 	GetAllPets(userId string) ([]Pet, error)
 	FindPetById(id string) (*Pet, error)
 	UploadPetProfile(id string, profileUrl string) error
+	DeletePet(petID string) (string, error)
 }
 type ShopStore interface {
 	GetAllShops() ([]PetShopDetails, error)

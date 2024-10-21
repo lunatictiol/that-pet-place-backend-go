@@ -39,6 +39,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 	router.HandleFunc("/pet/getPetDetails", h.handleGetPetDetails).Methods("Get")
 	router.HandleFunc("/pet/getAllPets", h.handleGetAllPets).Methods("Get")
 	router.HandleFunc("/pet/updatePet", h.handleUpdatePet).Methods("POST")
+	router.HandleFunc("/pet/Delete", h.handleDeletePet).Methods("DELETE")
 	router.HandleFunc("/pet/uploadPetProfile", h.handleProfileUpload).Methods("POST")
 
 }
@@ -194,5 +195,25 @@ func (h *Handler) handleProfileUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	utils.WriteJson(w, http.StatusCreated, map[string]string{"message": "upload successful", "url": publicURL})
+
+}
+
+func (h *Handler) handleDeletePet(w http.ResponseWriter, r *http.Request) {
+	uId := r.URL.Query().Get("petID")
+	_, err := h.store.FindPetById(uId)
+
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusBadRequest, fmt.Errorf("pet doesn't exists with id %s", uId))
+		println(err)
+		return
+	}
+
+	str, err := h.store.DeletePet(uId)
+	if err != nil {
+		utils.WriteJsonError(w, http.StatusInternalServerError, err)
+		println(err)
+		return
+	}
+	utils.WriteJson(w, http.StatusOK, map[string]string{"message": "pet deleted successful", "id": str})
 
 }
