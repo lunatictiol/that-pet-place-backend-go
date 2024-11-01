@@ -1,6 +1,3 @@
-Here’s a simplified README for your "That Pet Place Backend" project:
-
----
 
 # That Pet Place Backend
 
