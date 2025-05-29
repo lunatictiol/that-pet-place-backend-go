@@ -25,9 +25,9 @@ func initConfig() Config {
 	godotenv.Load()
 
 	return Config{
-		DBHost:                 getEnv("DATABASE_HOST", "http://localhost"),
-		DBUser:                 getEnv("DATABASE_USER", "root"),
-		DBPassword:             getEnv("DATABASE_PASSWORD", "sabiq1234"),
+		DBHost:                 getEnv("DATABASE_HOST", "postgresql+asyncpg://"),
+		DBUser:                 getEnv("DATABASE_USER", "myuser"),
+		DBPassword:             getEnv("DATABASE_PASSWORD", "mypassword"),
 		DBName:                 getEnv("DATABASE_NAME", "users"),
 		JWTSecret:              getEnv("JWT_SECRET", "not-so-secret-now-is-it?"),
 		JWTExpirationInSeconds: getEnvAsInt("JWT_EXPIRATION_IN_SECONDS", 3600*24*7),

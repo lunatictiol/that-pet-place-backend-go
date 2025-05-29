@@ -12,15 +12,15 @@ import (
 
 func main() {
 	var apiServer api.ApiServer
-	connStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
-
+	//connStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
+	connStr := "postgresql+asyncpg://myuser:mypassword@postgres:5432/users"
 	userdb, err := db.NewMySqlStorage(connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	initStorage(userdb)
-	petStoreStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
-
+	//petStoreStr := fmt.Sprintf("user='%s' password=%s host=%s dbname='%s'", config.Envs.DBUser, config.Envs.DBPassword, config.Envs.DBHost, config.Envs.DBName)
+	petStoreStr := "postgresql+asyncpg://myuser:mypassword@postgres:5432/pets"
 	petdb, err := db.NewMySqlStorage(petStoreStr)
 	if err != nil {
 		log.Fatal(err)
@@ -31,7 +31,7 @@ func main() {
 	shopdb, err := db.NewMongoDbConnection(config.Envs.MongoURL)
 	fapp, err := config.InitFirebaseApp()
 
-	apiServer.New(portString, userdb, petdb, shopdb,fapp)
+	apiServer.New(portString, userdb, petdb, shopdb, fapp)
 	err = apiServer.Run()
 	if err != nil {
 		log.Fatal(err)
